@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "@elastic/elasticsearch": "^9.3.2",
+    "@types/express": "^5.0.6",
+    "bullmq": "^5.70.0",
+    "express": "^5.2.1",
+    "ioredis": "^5.9.3"
+  },
+  "name": "vibequeue",
+  "version": "1.0.0",
+  "description": "A production-style distributed background job processing system built using:",
+  "main": "index.js",
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
