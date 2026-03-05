@@ -9,7 +9,7 @@ const defaultJobOptions: QueueOptions["defaultJobOptions"] = {
     type: "exponential", // exponential retry delay
     delay: 1000, // base delay 1s
   },
-  removeOnComplete: true,
+  removeOnComplete: false,
   removeOnFail: false, // keep failed for DLQ processing
 };
 

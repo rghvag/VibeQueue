@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@elastic/elasticsearch": "^9.3.2",
+    "@elastic/elasticsearch": "^8.19.1",
     "@types/express": "^5.0.6",
     "bullmq": "^5.70.0",
     "express": "^5.2.1",
@@ -14,7 +14,9 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "dev": "node dist/index",
+    "worker": "node dist/worker/worker"
   },
   "keywords": [],
   "author": "",

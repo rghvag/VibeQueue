@@ -1,18 +1,69 @@
-import { Worker } from "worker_threads";
-import path from "path";
 import { indexJob } from "../services/elastic.service";
+import { EmailJob } from "../types/tasks";
 
-export function processTask(job: any): Promise<any> {
-  return new Promise((resolve, reject) => {
-    const thread = new Worker(path.resolve(__dirname, "thread.worker.js"), {
-      workerData: job.data,
+export async function processEmail(job: EmailJob) {
+  console.log("processing job", job.id);
+  if (!job.id || !job.data.to) {
+    return;
+  }
+  const { to, subject, text } = job.data;
+
+  try {
+    // const info = await transporter.sendMail({
+    console.log("sending email:", {
+      from: "process.env.SMTP_FROM",
+      to,
+      subject,
+      text,
     });
 
-    thread.on("message", async (result) => {
-      await indexJob(job.id, result);
-      resolve(result);
+    const result = {
+      type: "email",
+      to,
+      subject,
+      text,
+      messageId: "some-random-id",
+      status: "SENT",
+      timestamp: new Date().toISOString(),
+    };
+
+    await indexJob(job.id, result);
+    return result;
+  } catch (error: any) {
+    console.error("Email sending failed:", error);
+    throw error;
+  }
+}
+
+export async function processNotification(job: any) {
+  console.log("processing job", job.id);
+  if (!job.id || !job.data.to) {
+    return;
+  }
+  const { to, subject, text } = job.data;
+  try {
+    // const info = await transporter.sendMail({
+    console.log("sending notification:", {
+      from: "99999999",
+      to,
+      subject,
+      text,
     });
 
-    thread.on("error", reject);
-  });
+    const result = {
+      type: "notification",
+      to,
+      subject,
+      text,
+      timestamp: new Date().toISOString(),
+      messageId: "some-random-id",
+      status: "SENT",
+    };
+
+    await indexJob(job.id, result);
+    return result;
+  } catch (error: any) {
+    console.error("Notification sending failed:", error);
+    throw error;
+  }
 }

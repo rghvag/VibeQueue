@@ -1,7 +1,7 @@
-import {
-  QueryDslQueryContainer,
-  SortOrder,
-} from "@elastic/elasticsearch/lib/api/types";
+import { estypes } from "@elastic/elasticsearch";
+
+type Query = estypes.QueryDslQueryContainer;
+type SortOrder = estypes.SortOrder;
 import { Request, Response, NextFunction } from "express";
 import { createTask } from "../../services/task.service";
 import {
@@ -30,7 +30,7 @@ export async function createTaskHandler(req: Request, res: Response) {
     return res.status(409).json({ error: "Duplicate detected" });
   }
 
-  return res.status(201).json({ jobId: job.id });
+  return res.status(201).json({ jobId: job.id, job, stored });
 }
 
 export async function getTaskStatus(req: Request, res: Response) {
@@ -61,9 +61,10 @@ export async function searchTasks(
       sort = "createdAt",
       order = "desc",
     } = req.query as Record<string, string>;
+    console.log("Search params:", { type, page, limit, sort, order });
 
-    const pageNumber = Math.max(parseInt(page), 1);
-    const pageSize = Math.min(parseInt(limit), 100);
+    const pageNumber = Math.max(parseInt(page) || 1, 1);
+    const pageSize = Math.min(parseInt(limit) || 10, 100);
     const from = (pageNumber - 1) * pageSize;
 
     const allowedSortFields = ["createdAt", "priority", "status"];
@@ -71,32 +72,20 @@ export async function searchTasks(
 
     const sortOrder: SortOrder = order === "asc" ? "asc" : "desc";
 
-    const query: QueryDslQueryContainer = type
-      ? {
-          bool: {
-            must: [
-              {
-                match: { type },
-              },
-            ],
-          },
-        }
-      : {
-          match_all: {},
-        };
+    const query: Query = type ? { term: { type } } : { match_all: {} };
 
     const result = await elasticClient.search({
       index: "jobs",
       from,
       size: pageSize,
       query,
-      sort: [
-        {
-          [sortField]: {
-            order: sortOrder,
-          },
-        },
-      ],
+      // sort: [
+      //   {
+      //     [sortField]: {
+      //       order: sortOrder,
+      //     },
+      //   },
+      // ],
     });
 
     return res.json({
