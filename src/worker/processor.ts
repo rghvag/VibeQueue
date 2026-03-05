@@ -3,6 +3,7 @@ import path from "path";
 import { indexJob } from "../services/elastic.service";
 
 export function processTask(job: any): Promise<any> {
+  console.log("processing job", job);
   return new Promise((resolve, reject) => {
     const thread = new Worker(path.resolve(__dirname, "thread.worker.js"), {
       workerData: job.data,

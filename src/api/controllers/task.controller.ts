@@ -1,7 +1,7 @@
-import {
-  QueryDslQueryContainer,
-  SortOrder,
-} from "@elastic/elasticsearch/lib/api/types";
+import { estypes } from "@elastic/elasticsearch";
+
+type Query = estypes.QueryDslQueryContainer;
+type SortOrder = estypes.SortOrder;
 import { Request, Response, NextFunction } from "express";
 import { createTask } from "../../services/task.service";
 import {
@@ -12,6 +12,7 @@ import { taskQueue } from "../../queue/bull.config";
 import { elasticClient } from "../../config/elastic";
 
 export async function createTaskHandler(req: Request, res: Response) {
+  console.log(req.header);
   const idemKey = req.header("Idempotency-Key");
 
   if (!idemKey) {
@@ -61,6 +62,7 @@ export async function searchTasks(
       sort = "createdAt",
       order = "desc",
     } = req.query as Record<string, string>;
+    console.log("Search params:", { type, page, limit, sort, order });
 
     const pageNumber = Math.max(parseInt(page), 1);
     const pageSize = Math.min(parseInt(limit), 100);
@@ -71,7 +73,7 @@ export async function searchTasks(
 
     const sortOrder: SortOrder = order === "asc" ? "asc" : "desc";
 
-    const query: QueryDslQueryContainer = type
+    const query: Query = type
       ? {
           bool: {
             must: [
