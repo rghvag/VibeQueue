@@ -61,8 +61,6 @@ export async function searchTasks(
       sort = "createdAt",
       order = "desc",
     } = req.query as Record<string, string>;
-    console.log("Search params:", { type, page, limit, sort, order });
-
     const pageNumber = Math.max(parseInt(page) || 1, 1);
     const pageSize = Math.min(parseInt(limit) || 10, 100);
     const from = (pageNumber - 1) * pageSize;
